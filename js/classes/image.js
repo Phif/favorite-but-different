@@ -82,8 +82,6 @@ export default class ImageElement {
         <h2 id="full-image-caption" title="Edit this caption">${this.caption}</h2>
         <div id="full-image-buttons">
         <button id="full-image-delete" class="option-button material-symbols-rounded" title="Delete this image">delete</button>
-        <button id="full-image-crop" class="option-button material-symbols-rounded" title="Crop this image">crop</button>
-        <button id="full-image-validate-crop" class="option-button material-symbols-rounded button-disabled" title="Validate current cropping">check</button>
         </div>
         `;
         
@@ -92,7 +90,6 @@ export default class ImageElement {
         let fullImageCaption = document.querySelector("#full-image-caption");
         let fullImageCloseButton = document.querySelector("#full-image-close");
         let fullImageDeleteButton = document.querySelector("#full-image-delete");        
-        let fullImageCropButton = document.querySelector("#full-image-crop");
         
         fullImageContainer.onmousedown = (event) => {
             if (event.target === event.currentTarget) {
@@ -122,56 +119,7 @@ export default class ImageElement {
             document.querySelector(`#image-container-${this.id}`).remove();
             fullImageContainer.remove();
             new Message("crimson", `Image was successfully deleted.`, "", 3000).create();            
-        };
-        
-        fullImageCropButton.onclick = () => {
-            if (!this.isCropping) {
-                document.querySelector("#full-image-crop").innerHTML = "cancel";
-                document.querySelector("#full-image-crop").title = "Cancel current cropping";
-                document.querySelector("#full-image-validate-crop").classList.toggle("button-disabled");
-                this.isCropping = true;
-                this.startCropping(fullImage);
-            } else {
-                this.stopCropping(fullImage);
-            }
-                
-        }
-    }
-    
-    startCropping(image) {
-        let croppie = new Croppie(image, {
-            boundary: { width: image.width, height: image.height },
-            showZoomer: false,
-        });
-        document.querySelector("#full-image-crop-container").appendChild(document.querySelector(".croppie-container"));
-
-        document.querySelector("#full-image-validate-crop").onclick = () => {
-            if (this.isCropping) {
-                this.validateCropping(image, croppie);
-            }
-        }
-    }
-    
-    validateCropping(image, croppie) {
-        croppie.result('blob').then((blob) => {
-            let reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = () => {
-                let base64data = reader.result;
-                document.querySelector(`#${this.id}`).src = base64data;
-                this.stopCropping(image);
-                new Message("dodgerblue", `Image was successfully cropped.`, `<img src="${base64data}">`, 3000).create();
-            }
-        });
-    }
-    
-    stopCropping(image) {      
-        this.isCropping = false;
-        document.querySelector("#full-image-crop").innerHTML = "crop";
-        document.querySelector("#full-image-crop").title = "Crop this image";
-        document.querySelector("#full-image-validate-crop").classList.toggle("button-disabled");
-        document.querySelector("#full-image-crop-container").appendChild(image);
-        document.querySelector(".croppie-container").remove();
+        };                
     }
     
     resizeImage(image, maxWidth, maxHeight) {
